@@ -11,7 +11,7 @@ type alias Blob =
   { x : Float, y : Float, vx : Float, vy : Float, dir : Float, radius : Float }
 
 blob : Blob
-blob = { x = 0, y = 0, vx = 0, vy = 0, dir = 0, radius = 15 }
+blob = { x = 0, y = 0, vx = 0, vy = 0, dir = 0, radius = 45 }
 
 type alias Keys = { x:Int, y:Int }
 
