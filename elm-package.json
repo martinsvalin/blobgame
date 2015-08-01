@@ -1,0 +1,14 @@
+{
+    "version": "0.0.1",
+    "summary": "A blob eat blob kind of game.",
+    "repository": "https://github.com/martinsvalin/elm_blob_game.git",
+    "license": "MIT",
+    "source-directories": [
+        "."
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "elm-lang/core": "2.1.0 <= v < 3.0.0"
+    },
+    "elm-version": "0.15.1 <= v < 0.16.0"
+}
