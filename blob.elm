@@ -16,8 +16,8 @@ type alias Blob =
   , radius : Float
   }
 
-blob : Blob
-blob =
+playerBlob : Blob
+playerBlob =
   { x = 0
   , y = 0
   , vx = 0
@@ -73,16 +73,16 @@ physics dt blob =
 -- VIEW
 
 view : (Int, Int) -> Blob -> Element
-view (w',h') blob =
+view (w',h') playerBlob =
   let
     (w,h) = (toFloat w', toFloat h')
   in
     collage w' h'
       [ rect w h
           |> filled (rgb 38 38 38)
-      , blobForm blob.radius
-          |> rotate blob.dir
-          |> move (blob.x, blob.y)
+      , blobForm playerBlob.radius
+          |> rotate playerBlob.dir
+          |> move (playerBlob.x, playerBlob.y)
       ]
 
 
@@ -104,7 +104,7 @@ blobForm radius =
 
 main : Signal Element
 main =
-  Signal.map2 view Window.dimensions (Signal.foldp update blob input)
+  Signal.map2 view Window.dimensions (Signal.foldp update playerBlob input)
 
 input : Signal (Float, Keys)
 input =
