@@ -31,11 +31,12 @@ type alias Keys = { x:Int, y:Int }
 
 -- UPDATE
 
-update : (Float, Keys) -> Blob -> Blob
-update (dt, keys) blob =
+update : ((Float, Keys), (Int, Int)) -> Blob -> Blob
+update ((dt, keys), (w, h)) blob =
   blob
   |> turn keys
   |> thrust keys
+  |> bounce (w, h)
   |> physics dt
 
 turn : Keys -> Blob -> Blob
@@ -61,6 +62,38 @@ thrust keys blob =
           vx <- blob.vx + dvx,
           vy <- blob.vy + dvy
         }
+      else blob
+
+bounce : (Int, Int) -> Blob -> Blob
+bounce (w, h) blob =
+  blob
+    |> bounceX w
+    |> bounceY h
+
+bounceX : Int -> Blob -> Blob
+bounceX w blob =
+  let
+    w' = toFloat w
+    right = w'/2
+    left = -w'/2
+    touchingRight = blob.x + blob.radius > right
+    touchingLeft = blob.x - blob.radius < left
+  in
+    if touchingRight || touchingLeft
+      then { blob | vx <- -blob.vx }
+      else blob
+
+bounceY : Int -> Blob -> Blob
+bounceY h blob =
+  let
+    h' = toFloat h
+    top = h'/2
+    bottom = -h'/2
+    touchingTop = blob.y + blob.radius > top
+    touchingBottom = blob.y - blob.radius < bottom
+  in
+    if touchingTop || touchingBottom
+      then { blob | vy <- -blob.vy }
       else blob
 
 physics : Float -> Blob -> Blob
@@ -104,7 +137,7 @@ blobForm radius =
 
 main : Signal Element
 main =
-  Signal.map2 view Window.dimensions (Signal.foldp update playerBlob input)
+  Signal.map2 view Window.dimensions (Signal.foldp update playerBlob (Signal.map2 (,) input Window.dimensions))
 
 input : Signal (Float, Keys)
 input =
