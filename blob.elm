@@ -26,16 +26,35 @@ playerBlob =
   , radius = 45
   }
 
+otherBlobs : List Blob
+otherBlobs =
+  [
+    { x=50, y=50, vx=0.5, vy=0.1, dir=pi, radius=15},
+    { x=-50, y=10, vx=-0.5, vy=0.1, dir=3, radius=20},
+    { x=-150, y=-100, vx=0.1, vy=0.5, dir=6, radius=10},
+    { x=350, y=-300, vx=0, vy=0, dir=0, radius=50}
+  ]
+
 type alias Keys = { x:Int, y:Int }
 
 
 -- UPDATE
 
-update : ((Float, Keys), (Int, Int)) -> Blob -> Blob
-update ((dt, keys), (w, h)) blob =
+update : ((Float, Keys), (Int, Int)) -> (Blob, List Blob) -> (Blob, List Blob)
+update ((dt, keys), (w, h)) (playerBlob, otherBlobs) =
+  (updatePlayer ((dt, keys), (w, h)) playerBlob, List.map (updateBlob ((dt, keys), (w, h))) otherBlobs)
+
+updatePlayer : ((Float, Keys), (Int, Int)) -> Blob -> Blob
+updatePlayer ((dt, keys), (w, h)) blob =
   blob
   |> turn keys
   |> thrust keys
+  |> bounce (w, h)
+  |> physics dt
+
+updateBlob : ((Float, Keys), (Int, Int)) -> Blob -> Blob
+updateBlob ((dt, keys), (w, h)) blob =
+  blob
   |> bounce (w, h)
   |> physics dt
 
@@ -110,39 +129,38 @@ physics dt blob =
 
 -- VIEW
 
-view : (Int, Int) -> Blob -> Element
-view (w',h') playerBlob =
+view : (Int, Int) -> (Blob, List Blob) -> Element
+view (w',h') (playerBlob, otherBlobs) =
   let
     (w,h) = (toFloat w', toFloat h')
+    background = rect w h |> filled (rgb 38 38 38)
+    blobs = otherBlobs ++ [playerBlob]
   in
     collage w' h'
-      [ rect w h
-          |> filled (rgb 38 38 38)
-      , blobForm playerBlob.radius
-          |> rotate playerBlob.dir
-          |> move (playerBlob.x, playerBlob.y)
-      ]
+      ([background] ++ (List.map blobForm blobs))
 
 
-blobForm : Float -> Form
-blobForm radius =
+blobForm : Blob -> Form
+blobForm blob =
   let
-    (w,h) = (radius, 2)
-    positionX = radius/2
+    (w,h) = (blob.radius, 2)
+    positionX = blob.radius/2
   in
     group
-      [ circle radius
+      [ circle blob.radius
           |> filled (rgb 255 180 200)
       , rect w h
           |> filled (rgb 0 0 0)
           |> moveX positionX
       ]
+    |> rotate blob.dir
+    |> move (blob.x, blob.y)
 
 -- SIGNALS
 
 main : Signal Element
 main =
-  Signal.map2 view Window.dimensions (Signal.foldp update playerBlob (Signal.map2 (,) input Window.dimensions))
+  Signal.map2 view Window.dimensions (Signal.foldp update (playerBlob, otherBlobs) (Signal.map2 (,) input Window.dimensions))
 
 input : Signal (Float, Keys)
 input =
