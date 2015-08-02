@@ -34,8 +34,18 @@ type alias Keys = { x:Int, y:Int }
 update : (Float, Keys) -> Blob -> Blob
 update (dt, keys) blob =
   blob
+  |> turn keys
   |> thrust keys
   |> physics dt
+
+turn : Keys -> Blob -> Blob
+turn keys blob =
+  let
+    turnSpeed = 10
+  in
+    { blob |
+      dir <- blob.dir + (toFloat keys.x)/turnSpeed
+    }
 
 thrust : Keys -> Blob -> Blob
 thrust keys blob =
