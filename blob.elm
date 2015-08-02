@@ -22,7 +22,7 @@ blob =
   , y = 0
   , vx = 0
   , vy = 0
-  , dir = 0
+  , dir = pi/2
   , radius = 45
   }
 
@@ -60,11 +60,25 @@ view (w',h') blob =
     collage w' h'
       [ rect w h
           |> filled (rgb 38 38 38)
-        , circle blob.radius
-          |> filled (rgb 255 180 200)
+      , blobForm blob.radius
+          |> rotate blob.dir
           |> move (blob.x, blob.y)
       ]
 
+
+blobForm : Float -> Form
+blobForm radius =
+  let
+    (w,h) = (radius, 2)
+    positionX = radius/2
+  in
+    group
+      [ circle radius
+          |> filled (rgb 255 180 200)
+      , rect w h
+          |> filled (rgb 0 0 0)
+          |> moveX positionX
+      ]
 
 -- SIGNALS
 
