@@ -49,9 +49,19 @@ turn keys blob =
 
 thrust : Keys -> Blob -> Blob
 thrust keys blob =
-  { blob |
-    vy <- blob.vy + (toFloat keys.y)
-  }
+  let
+    speed = 0.3
+    v = (toFloat keys.y) * speed
+    dvx = cos blob.dir * v
+    dvy = sin blob.dir * v
+  in
+    if v > 0
+      then
+        { blob |
+          vx <- blob.vx + dvx,
+          vy <- blob.vy + dvy
+        }
+      else blob
 
 physics : Float -> Blob -> Blob
 physics dt blob =
