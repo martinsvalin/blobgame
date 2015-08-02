@@ -51,18 +51,23 @@ turn keys blob =
 thrust : Keys -> Blob -> Blob
 thrust keys blob =
   let
-    speed = 0.3
-    v = (toFloat keys.y) * speed
+    force = 0.1
+    limit = 10 / sqrt blob.radius
+    v = (toFloat keys.y) * force
     dvx = cos blob.dir * v
     dvy = sin blob.dir * v
   in
     if v > 0
       then
         { blob |
-          vx <- blob.vx + dvx,
-          vy <- blob.vy + dvy
+          vx <- within limit (blob.vx + dvx),
+          vy <- within limit (blob.vy + dvy)
         }
       else blob
+
+within : Float -> Float -> Float
+within limit value =
+  max -limit (min limit value)
 
 bounce : (Int, Int) -> Blob -> Blob
 bounce (w, h) blob =
