@@ -103,7 +103,7 @@ bounceX w blob =
     touchingRight = blob.x + blob.radius > right
     touchingLeft = blob.x - blob.radius < left
   in
-    if touchingRight || touchingLeft
+    if (touchingRight && blob.vx > 0) || (touchingLeft && blob.vx < 0)
       then { blob | vx <- -blob.vx }
       else blob
 
@@ -116,7 +116,7 @@ bounceY h blob =
     touchingTop = blob.y + blob.radius > top
     touchingBottom = blob.y - blob.radius < bottom
   in
-    if touchingTop || touchingBottom
+    if (touchingTop && blob.vy > 0) || (touchingBottom && blob.vx < 0)
       then { blob | vy <- -blob.vy }
       else blob
 
